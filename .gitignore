@@ -1,0 +1,7 @@
+.DS_Store
+.idea/
+animal.pb.cc
+animal.pb.h
+cmake-build-debug/
+cmake-build/
+venv/
