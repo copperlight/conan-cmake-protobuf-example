@@ -28,8 +28,8 @@ if [[ "$1" == "clean" ]]; then
 fi
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  export CC=gcc-11
-  export CXX=g++-11
+  export CC=gcc-13
+  export CXX=g++-13
 fi
 
 if [[ ! -f "$HOME/.conan2/profiles/default" ]]; then
