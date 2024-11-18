@@ -11,6 +11,11 @@ BUILD_TYPE=Release
 BLUE="\033[0;34m"
 NC="\033[0m"
 
+if [[ "$DISTRIB_CODENAME" = "jammy" ]]; then
+  echo -e "${BLUE}==== fix kernel mmap rnd bits on ubuntu 22.04 to allow asan ====${NC}"
+  sudo sysctl vm.mmap_rnd_bits=28
+fi
+
 if [[ "$1" == "clean" ]]; then
   echo -e "${BLUE}==== clean ====${NC}"
   rm -rf $BUILD_DIR
