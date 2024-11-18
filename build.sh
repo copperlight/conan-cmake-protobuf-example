@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
+# usage: ./build.sh [clean|clean --confirm|skiptest]
+
+set -e
+
 BUILD_DIR=cmake-build
+# Choose: Debug, Release, RelWithDebInfo, MinSizeRel. Use Debug for asan checking locally.
+BUILD_TYPE=Release
 
 BLUE="\033[0;34m"
 NC="\033[0m"
@@ -10,6 +16,10 @@ if [[ "$1" == "clean" ]]; then
   rm -rf $BUILD_DIR
   rm animal.pb.cc
   rm animal.pb.h
+  if [[ "$2" == "--confirm" ]]; then
+    # remove all packages from the conan cache, to allow swapping between Release/Debug builds
+    conan remove '*' --confirm
+  fi
 fi
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -17,24 +27,42 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   export CXX=g++-11
 fi
 
-if [[ ! -d $BUILD_DIR ]]; then
-  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    echo -e "${BLUE}==== configure default profile ====${NC}"
-    conan profile new default --detect
-    conan profile update settings.compiler.libcxx=libstdc++11 default
-  fi
+if [[ ! -f "$HOME/.conan2/profiles/default" ]]; then
+  echo -e "${BLUE}==== create default profile ====${NC}"
+  conan profile detect
+fi
 
+if [[ ! -d $BUILD_DIR ]]; then
   echo -e "${BLUE}==== install required dependencies ====${NC}"
-  conan install . --build=missing --install-folder $BUILD_DIR
+  if [[ "$BUILD_TYPE" == "Debug" ]]; then
+    conan install . --output-folder=$BUILD_DIR --build="*" --settings=build_type=$BUILD_TYPE --profile=./sanitized
+  else
+    conan install . --output-folder=$BUILD_DIR --build=missing
+  fi
 fi
 
 pushd $BUILD_DIR || exit 1
 
+echo -e "${BLUE}==== configure conan environment to access tools ====${NC}"
+source conanbuild.sh
+
+if [[ $OSTYPE == 'darwin'* ]]; then
+  export MallocNanoZone=0
+fi
+
 echo -e "${BLUE}==== generate build files ====${NC}"
-# Choose: Debug, Release, RelWithDebInfo and MinSizeRel
-cmake .. -DCMAKE_BUILD_TYPE=Debug || exit 1
+cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE || exit 1
 
 echo -e "${BLUE}==== build ====${NC}"
 cmake --build . || exit 1
+
+echo -e "${BLUE}==== test ====${NC}"
+BINARY="pb-example"
+
+if [[ -f $BINARY ]] && [[ -x $BINARY ]]; then
+  ./$BINARY
+else
+  echo "binary $BINARY does not exist"
+fi
 
 popd || exit 1

@@ -1,8 +1,12 @@
-from conans import ConanFile
+from conan import ConanFile
 
 
-class SpectatorDConan(ConanFile):
+class ProtobufExampleConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    requires = "protobuf/3.21.12"
-    generators = "cmake"
-    default_options = {}
+    requires = (
+        "protobuf/5.27.0",
+    )
+    tool_requires = (
+        "protobuf/5.27.0",
+    )
+    generators = "CMakeDeps", "CMakeToolchain"
