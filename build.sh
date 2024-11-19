@@ -66,10 +66,12 @@ cmake --build . || exit 1
 echo -e "${BLUE}==== test ====${NC}"
 BINARY="pb-example"
 
-if [[ -f $BINARY ]] && [[ -x $BINARY ]]; then
-  ./$BINARY
-else
-  echo "binary $BINARY does not exist"
+if [[ "$1" != "skiptest" ]]; then
+  if [[ -f $BINARY ]] && [[ -x $BINARY ]]; then
+    ./$BINARY
+  else
+    echo "binary $BINARY does not exist"
+  fi
 fi
 
 popd || exit 1
