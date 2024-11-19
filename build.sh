@@ -25,7 +25,7 @@ if [[ "$1" == "clean" ]]; then
   rm animal.pb.h
   if [[ "$2" == "--confirm" ]]; then
     # remove all packages from the conan cache, to allow swapping between Release/Debug builds
-    conan remove '*' --confirm
+    conan remove "*" --confirm
   fi
 fi
 
@@ -53,7 +53,7 @@ pushd $BUILD_DIR || exit 1
 echo -e "${BLUE}==== configure conan environment to access tools ====${NC}"
 source conanbuild.sh
 
-if [[ $OSTYPE == 'darwin'* ]]; then
+if [[ $OSTYPE == "darwin"* ]]; then
   export MallocNanoZone=0
 fi
 
