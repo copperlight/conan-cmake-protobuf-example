@@ -65,7 +65,7 @@ echo -e "${BLUE}==== build ====${NC}"
 cmake --build .
 
 echo -e "${BLUE}==== test ====${NC}"
-BINARY="pb-example"
+BINARY="bin/pb-example"
 
 if [[ "$1" != "skiptest" ]]; then
   if [[ -f $BINARY ]] && [[ -x $BINARY ]]; then
