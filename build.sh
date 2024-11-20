@@ -2,7 +2,7 @@
 
 # usage: ./build.sh [clean|clean --confirm|skiptest]
 
-set -e
+set -eu
 
 BUILD_DIR=cmake-build
 # Choose: Debug, Release, RelWithDebInfo, MinSizeRel. Use Debug for asan checking locally.
@@ -49,7 +49,7 @@ if [[ ! -d $BUILD_DIR ]]; then
   fi
 fi
 
-pushd $BUILD_DIR || exit 1
+pushd $BUILD_DIR
 
 echo -e "${BLUE}==== configure conan environment to access tools ====${NC}"
 source conanbuild.sh
@@ -59,10 +59,10 @@ if [[ $OSTYPE == "darwin"* ]]; then
 fi
 
 echo -e "${BLUE}==== generate build files ====${NC}"
-cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE || exit 1
+cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
 echo -e "${BLUE}==== build ====${NC}"
-cmake --build . || exit 1
+cmake --build .
 
 echo -e "${BLUE}==== test ====${NC}"
 BINARY="pb-example"
@@ -75,4 +75,4 @@ if [[ "$1" != "skiptest" ]]; then
   fi
 fi
 
-popd || exit 1
+popd
