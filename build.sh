@@ -2,7 +2,7 @@
 
 # usage: ./build.sh [clean|clean --confirm|skiptest]
 
-set -eu
+set -e
 
 BUILD_DIR=cmake-build
 # Choose: Debug, Release, RelWithDebInfo, MinSizeRel. Use Debug for asan checking locally.
